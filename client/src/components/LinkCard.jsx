@@ -1,0 +1,49 @@
+import Card from "./Card";
+import Link from "./Link";
+import styles from "./LinkCard.module.css";
+
+function LinkCard({ thumbUrl, title, url, onClick, onDelete }) {
+  function handleLinkClick(e) {
+    e.stopPropagation();
+  }
+
+  function handleDelete(e) {
+    e.stopPropagation();
+    onDelete();
+  }
+
+  return (
+    <Card
+      className={`${styles.LinkCard} ${onClick ? styles.editable : ""}`}
+      onClick={onClick}
+    >
+      <img
+        className={styles.Thumbnail}
+        src={thumbUrl ?? "/assets/og-default.png"}
+        alt="썸네일 이미지"
+      />
+      <div className={styles.Container}>
+        <div className={styles.LinkTitle}>{title}</div>
+        <Link
+          className={styles.LinkUrl}
+          appearance="secondary"
+          href={url}
+          target="_blank"
+          onClick={handleLinkClick}
+        >
+          {url}
+        </Link>
+      </div>
+      {onDelete && (
+        <img
+          className={styles.LinkDelete}
+          src="/assets/x-circle.svg"
+          alt="삭제 아이콘"
+          onClick={handleDelete}
+        />
+      )}
+    </Card>
+  );
+}
+
+export default LinkCard;
