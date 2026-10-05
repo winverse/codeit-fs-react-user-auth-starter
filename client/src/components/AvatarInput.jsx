@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Avatar from "./Avatar";
 import Button from "./Button";
-import styles from "./AvatarInput.module.css";
+import * as styles from "./AvatarInput.css.js";
 
 function AvatarInput({ className, initialAvatar, name, onChange }) {
   const [file, setFile] = useState(null);
@@ -35,11 +35,11 @@ function AvatarInput({ className, initialAvatar, name, onChange }) {
   }, [file, initialAvatar]);
 
   return (
-    <div className={`${styles.AvatarInput} ${className}`}>
+    <div className={`${styles.avatarInput} ${className}`}>
       <Avatar size="large" src={avatar} alt="아바타 이미지 미리보기" />
       <Button
         type="button"
-        className={styles.UploadButton}
+        className={styles.uploadButton}
         appearance="secondary"
         onClick={handleUploadClick}
       >
@@ -47,7 +47,7 @@ function AvatarInput({ className, initialAvatar, name, onChange }) {
         사진 업로드
       </Button>
       <input
-        className={styles.HiddenInput}
+        className={styles.hiddenInput}
         type="file"
         onChange={handleChange}
         ref={inputRef}

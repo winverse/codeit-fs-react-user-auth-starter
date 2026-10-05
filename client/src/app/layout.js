@@ -1,6 +1,6 @@
+import "@/styles/globals.css.js";
 import { Noto_Sans_KR } from "next/font/google";
 import Providers from "@/components/Providers";
-import "./globals.css";
 
 const notoSansKr = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",

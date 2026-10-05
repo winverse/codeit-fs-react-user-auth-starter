@@ -1,36 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import axios from "@/lib/axios";
+import { getUser, getUserLinks } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
 import Avatar from "@/components/Avatar";
 import Card from "@/components/Card";
 import HorizontalRule from "@/components/HorizontalRule";
 import LinkCard from "@/components/LinkCard";
-import styles from "./UserPage.module.css";
+import * as styles from "./UserPage.css.js";
 
 function UserPage() {
-  const [user, setUser] = useState(null);
-  const [links, setLinks] = useState([]);
   const params = useParams();
   const userId = params.userId;
 
-  async function getUser(id) {
-    const res = await axios.get(`/users/${id}`);
-    const nextUser = res.data;
-    setUser(nextUser);
-  }
+  const { data: user } = useQuery({
+    queryKey: queryKeys.users.info(userId),
+    queryFn: () => getUser(userId),
+  });
 
-  async function getUserLinks(id) {
-    const res = await axios.get(`/users/${id}/links`);
-    const nextLinks = res.data;
-    setLinks(nextLinks);
-  }
-
-  useEffect(() => {
-    getUser(userId);
-    getUserLinks(userId);
-  }, [userId]);
+  const { data: links = [] } = useQuery({
+    queryKey: queryKeys.users.links(userId),
+    queryFn: () => getUserLinks(userId),
+  });
 
   if (!user) {
     return null;
@@ -38,20 +30,20 @@ function UserPage() {
 
   return (
     <>
-      <header className={styles.Header}>
-        <Card className={styles.Profile}>
+      <header className={styles.header}>
+        <Card className={styles.profile}>
           <Avatar src={user.avatar} alt="프로필 이미지" />
-          <div className={styles.Values}>
-            <div className={styles.Name}>{user.name}</div>
-            <div className={styles.Email}>{user.email}</div>
+          <div className={styles.values}>
+            <div className={styles.name}>{user.name}</div>
+            <div className={styles.email}>{user.email}</div>
           </div>
         </Card>
-        <p className={styles.Bio}>{user.bio}</p>
+        <p className={styles.bio}>{user.bio}</p>
       </header>
-      <HorizontalRule className={styles.HorizontalRule} />
-      <ul className={styles.LinkList}>
+      <HorizontalRule className={styles.horizontalRule} />
+      <ul className={styles.linkList}>
         {links.map((link) => (
-          <li className={styles.LinkItem} key={link.id}>
+          <li key={link.id}>
             <LinkCard
               title={link.title}
               thumbUrl={link.thumbUrl}

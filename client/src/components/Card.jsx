@@ -1,8 +1,8 @@
-import styles from "./Card.module.css";
+import * as styles from "./Card.css.js";
 
 function Card({ className = "", children, onClick }) {
   return (
-    <div className={`${styles.Card} ${className}`} onClick={onClick}>
+    <div className={`${styles.card} ${className}`} onClick={onClick}>
       {children}
     </div>
   );

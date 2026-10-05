@@ -2,23 +2,23 @@
 
 import { useRouter } from "next/navigation";
 import Nav, { PublicNav } from "./Nav";
-import styles from "./Layout.module.css";
+import * as styles from "./Layout.css.js";
 
 export function LandingLayout({ children }) {
   return (
-    <div className={styles.Layout}>
+    <div className={styles.layout}>
       <Nav />
-      <main className={`${styles.Main} ${styles.landing}`}>{children}</main>
+      <main className={`${styles.main} ${styles.landing}`}>{children}</main>
     </div>
   );
 }
 
 export function MyPageLayout({ children }) {
   return (
-    <div className={`${styles.Layout} ${styles.dark}`}>
+    <div className={`${styles.layout} ${styles.dark}`}>
       <Nav />
-      <main className={styles.Main}>
-        <div className={styles.Container}>{children}</div>
+      <main className={styles.main}>
+        <div className={styles.container}>{children}</div>
       </main>
     </div>
   );
@@ -26,10 +26,10 @@ export function MyPageLayout({ children }) {
 
 export function UserLayout({ children }) {
   return (
-    <div className={`${styles.Layout} ${styles.dark}`}>
+    <div className={`${styles.layout} ${styles.dark}`}>
       <PublicNav />
-      <main className={styles.Main}>
-        <div className={styles.Container}>{children}</div>
+      <main className={styles.main}>
+        <div className={styles.container}>{children}</div>
       </main>
     </div>
   );
@@ -43,11 +43,11 @@ export function FullLayout({ children }) {
   }
 
   return (
-    <main className={styles.FullLayout}>
-      <div className={styles.Container}>
-        <div className={styles.BackLinkContainer}>
+    <main className={styles.fullLayout}>
+      <div className={styles.container}>
+        <div className={styles.backLinkContainer}>
           <img
-            className={styles.BackLink}
+            className={styles.backLink}
             src="/assets/left-arrow.svg"
             alt="뒤로가기"
             onClick={handleClickBack}

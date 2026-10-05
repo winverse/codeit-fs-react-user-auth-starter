@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import axios from "@/lib/axios";
+import { createMyLink } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
 import Label from "@/components/Label";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import styles from "./CreateLinkPage.module.css";
+import * as styles from "./CreateLinkPage.css.js";
 
 function CreateLinkPage() {
   const [values, setValues] = useState({
@@ -14,6 +16,13 @@ function CreateLinkPage() {
     url: "",
   });
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const createLinkMutation = useMutation({
+    mutationFn: (newLink) => createMyLink(newLink),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.me.links() }),
+  });
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -24,42 +33,48 @@ function CreateLinkPage() {
     }));
   }
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     const { title, url } = values;
-    await axios.post("/users/me/links", { title, url });
-    router.push("/me");
+    createLinkMutation.mutate(
+      { title, url },
+      {
+        onSuccess: () => {
+          router.push("/me");
+        },
+      },
+    );
   }
 
   return (
     <>
-      <h1 className={styles.Heading}>링크 추가</h1>
-      <form className={styles.Form} onSubmit={handleSubmit}>
-        <Label className={styles.Label} htmlFor="title">
+      <h1 className={styles.heading}>링크 추가</h1>
+      <form onSubmit={handleSubmit}>
+        <Label className={styles.label} htmlFor="title">
           사이트 이름
         </Label>
         <Input
           id="title"
-          className={styles.Input}
+          className={styles.input}
           name="title"
           type="text"
           placeholder="사이트 이름"
           value={values.title}
           onChange={handleChange}
         />
-        <Label className={styles.Label} htmlFor="url">
+        <Label className={styles.label} htmlFor="url">
           링크
         </Label>
         <Input
           id="url"
-          className={styles.Input}
+          className={styles.input}
           name="url"
           type="text"
           placeholder="https://www.example.com"
           value={values.url}
           onChange={handleChange}
         />
-        <Button className={styles.Button}>등록하기</Button>
+        <Button className={styles.button}>등록하기</Button>
       </form>
     </>
   );

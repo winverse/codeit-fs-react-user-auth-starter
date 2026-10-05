@@ -1,7 +1,7 @@
-import styles from "./Input.module.css";
+import * as styles from "./Input.css.js";
 
 function Input({ className = "", ...rest }) {
-  return <input className={`${styles.Input} ${className}`} {...rest} />;
+  return <input className={`${styles.input} ${className}`} {...rest} />;
 }
 
 export default Input;

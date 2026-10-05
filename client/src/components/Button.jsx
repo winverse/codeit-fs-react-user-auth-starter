@@ -1,4 +1,4 @@
-import styles from "./Button.module.css";
+import * as styles from "./Button.css.js";
 
 function Button({
   className = "",
@@ -10,7 +10,7 @@ function Button({
   if (AsComponent) {
     return (
       <AsComponent
-        className={`${styles.Button} ${styles[appearance]} ${className}`}
+        className={`${styles.button} ${styles[appearance]} ${className}`}
         {...rest}
       >
         {children}
@@ -20,7 +20,7 @@ function Button({
 
   return (
     <button
-      className={`${styles.Button} ${styles[appearance]} ${className}`}
+      className={`${styles.button} ${styles[appearance]} ${className}`}
       {...rest}
     >
       {children}

@@ -1,6 +1,6 @@
 import Card from "./Card";
 import Link from "./Link";
-import styles from "./LinkCard.module.css";
+import * as styles from "./LinkCard.css.js";
 
 function LinkCard({ thumbUrl, title, url, onClick, onDelete }) {
   function handleLinkClick(e) {
@@ -14,18 +14,18 @@ function LinkCard({ thumbUrl, title, url, onClick, onDelete }) {
 
   return (
     <Card
-      className={`${styles.LinkCard} ${onClick ? styles.editable : ""}`}
+      className={`${styles.linkCard} ${onClick ? styles.editable : ""}`}
       onClick={onClick}
     >
       <img
-        className={styles.Thumbnail}
+        className={styles.thumbnail}
         src={thumbUrl ?? "/assets/og-default.png"}
         alt="썸네일 이미지"
       />
-      <div className={styles.Container}>
-        <div className={styles.LinkTitle}>{title}</div>
+      <div className={styles.container}>
+        <div className={styles.linkTitle}>{title}</div>
         <Link
-          className={styles.LinkUrl}
+          className={styles.linkUrl}
           appearance="secondary"
           href={url}
           target="_blank"
@@ -36,7 +36,7 @@ function LinkCard({ thumbUrl, title, url, onClick, onDelete }) {
       </div>
       {onDelete && (
         <img
-          className={styles.LinkDelete}
+          className={styles.linkDelete}
           src="/assets/x-circle.svg"
           alt="삭제 아이콘"
           onClick={handleDelete}

@@ -1,46 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import axios from "@/lib/axios";
+import { deleteMyLink, getMe, getMyLinks } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import Link from "@/components/Link";
 import HorizontalRule from "@/components/HorizontalRule";
 import LinkCard from "@/components/LinkCard";
-import styles from "./MyPage.module.css";
+import * as styles from "./MyPage.css.js";
 
 function MyPage() {
-  const [user, setUser] = useState(null);
-  const [links, setLinks] = useState([]);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  async function getMe() {
-    const res = await axios.get("/users/me");
-    const nextUser = res.data;
-    setUser(nextUser);
-  }
+  const { data: user } = useQuery({
+    queryKey: queryKeys.me.info(),
+    queryFn: () => getMe(),
+  });
 
-  async function getMyLinks() {
-    const res = await axios.get("/users/me/links");
-    const nextLinks = res.data;
-    setLinks(nextLinks);
-  }
+  const { data: links = [] } = useQuery({
+    queryKey: queryKeys.me.links(),
+    queryFn: () => getMyLinks(),
+  });
+
+  const deleteLinkMutation = useMutation({
+    mutationFn: (linkId) => deleteMyLink(linkId),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.me.links() }),
+  });
 
   function handleEditClick(linkId) {
     router.push(`/me/links/${linkId}/edit`);
   }
 
-  async function handleDeleteClick(linkId) {
-    await axios.delete(`/users/me/links/${linkId}`);
-    setLinks((prevLinks) => prevLinks.filter((link) => link.id !== linkId));
+  function handleDeleteClick(linkId) {
+    deleteLinkMutation.mutate(linkId);
   }
-
-  useEffect(() => {
-    getMe();
-    getMyLinks();
-  }, []);
 
   if (!user) {
     return null;
@@ -48,26 +46,26 @@ function MyPage() {
 
   return (
     <>
-      <header className={styles.Header}>
-        <Card className={styles.Profile}>
+      <header className={styles.header}>
+        <Card className={styles.profile}>
           <Avatar src={user.avatar} alt="프로필 이미지" />
-          <div className={styles.Values}>
-            <div className={styles.Name}>{user.name}</div>
-            <div className={styles.Email}>{user.email}</div>
+          <div className={styles.values}>
+            <div className={styles.name}>{user.name}</div>
+            <div className={styles.email}>{user.email}</div>
           </div>
-          <Button className={styles.EditButton} as={Link} href="/me/edit">
+          <Button className={styles.editButton} as={Link} href="/me/edit">
             편집
           </Button>
         </Card>
-        <p className={styles.Bio}>
+        <p className={styles.bio}>
           {user.bio ??
             "아래에 등록한 사이트들과 자신에 대해 간단하게 소개하는 설명을 작성해 주세요!"}
         </p>
       </header>
-      <HorizontalRule className={styles.HorizontalRule} />
-      <ul className={styles.LinkList}>
+      <HorizontalRule className={styles.horizontalRule} />
+      <ul className={styles.linkList}>
         {links.map((link) => (
-          <li className={styles.LinkItem} key={link.id}>
+          <li key={link.id}>
             <LinkCard
               title={link.title}
               url={link.url}
@@ -78,7 +76,7 @@ function MyPage() {
           </li>
         ))}
         <li>
-          <Link className={styles.CreateLink} href="/me/links/create">
+          <Link className={styles.createLink} href="/me/links/create">
             <img src="/assets/plus-square.svg" alt="더하기 아이콘" />
             링크 추가하기
           </Link>

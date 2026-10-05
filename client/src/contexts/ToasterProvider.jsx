@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 import useIsMounted from "@/hooks/useIsMounted";
-import styles from "./ToasterProvider.module.css";
+import * as styles from "./ToasterProvider.css.js";
 
 const ICONS = {
   info: "/assets/check.svg",
@@ -12,13 +12,13 @@ const ICONS = {
 function Toast({ type, message, onClick }) {
   const isMounted = useIsMounted(100);
   const icon = ICONS[type];
-  const className = `${styles.Toast} ${styles[type]} ${
+  const className = `${styles.toast} ${styles[type]} ${
     isMounted ? styles.mounted : ""
   }`;
 
   return (
     <div className={className} onClick={onClick}>
-      {icon && <img className={styles.Icon} src={icon} alt={type} />}
+      {icon && <img className={styles.icon} src={icon} alt={type} />}
       {message}
     </div>
   );
@@ -52,7 +52,7 @@ function ToasterProvider({ children }) {
   return (
     <ToasterContext.Provider value={{ toaster }}>
       {children}
-      <div className={styles.ToastContainer}>
+      <div className={styles.toastContainer}>
         {toasts.map((toast) => (
           <Toast
             key={toast.id}

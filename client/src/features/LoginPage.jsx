@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "@/lib/axios";
 import Label from "@/components/Label";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import HorizontalRule from "@/components/HorizontalRule";
 import Link from "@/components/Link";
-import styles from "./LoginPage.module.css";
+import * as styles from "./LoginPage.css.js";
 
 function LoginPage() {
   const [values, setValues] = useState({
@@ -33,37 +32,37 @@ function LoginPage() {
 
   return (
     <>
-      <h1 className={styles.Heading}>로그인</h1>
-      <form className={styles.Form} onSubmit={handleSubmit}>
-        <Label className={styles.Label} htmlFor="email">
+      <h1 className={styles.heading}>로그인</h1>
+      <form onSubmit={handleSubmit}>
+        <Label className={styles.label} htmlFor="email">
           이메일
         </Label>
         <Input
           id="email"
-          className={styles.Input}
+          className={styles.input}
           name="email"
           type="email"
           placeholder="이메일"
           value={values.email}
           onChange={handleChange}
         />
-        <Label className={styles.Label} htmlFor="password">
+        <Label className={styles.label} htmlFor="password">
           비밀번호
         </Label>
         <Input
           id="password"
-          className={styles.Input}
+          className={styles.input}
           name="password"
           type="password"
           placeholder="비밀번호"
           value={values.password}
           onChange={handleChange}
         />
-        <Button className={styles.Button}>로그인</Button>
-        <HorizontalRule className={styles.HorizontalRule}>또는</HorizontalRule>
+        <Button className={styles.button}>로그인</Button>
+        <HorizontalRule className={styles.horizontalRule}>또는</HorizontalRule>
         {/* TODO: 구글 로그인을 구현합니다. */}
         <Button
-          className={styles.GoogleButton}
+          className={styles.googleButton}
           type="button"
           appearance="outline"
         >

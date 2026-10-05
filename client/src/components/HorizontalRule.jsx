@@ -1,17 +1,17 @@
-import styles from "./HorizontalRule.module.css";
+import * as styles from "./HorizontalRule.css.js";
 
 function HorizontalRule({ className = "", children }) {
   if (children) {
     return (
-      <div className={`${className} ${styles.Container}`}>
-        <hr className={styles.HorizontalRule} />
-        <span className={styles.Text}>{children}</span>
-        <hr className={styles.HorizontalRule} />
+      <div className={`${className} ${styles.container}`}>
+        <hr className={styles.horizontalRule} />
+        <span className={styles.text}>{children}</span>
+        <hr className={styles.horizontalRule} />
       </div>
     );
   }
 
-  return <hr className={`${styles.HorizontalRule} ${className}`} />;
+  return <hr className={`${styles.horizontalRule} ${className}`} />;
 }
 
 export default HorizontalRule;

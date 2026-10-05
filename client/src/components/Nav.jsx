@@ -3,14 +3,14 @@
 import Avatar from "./Avatar";
 import Button from "./Button";
 import Link from "./Link";
-import styles from "./Nav.module.css";
+import * as styles from "./Nav.css.js";
 
 export function PublicNav() {
   return (
-    <header className={styles.Container}>
-      <nav className={`${styles.Nav} ${styles.public}`}>
+    <header className={styles.container}>
+      <nav className={`${styles.nav} ${styles.publicNav}`}>
         <Link href="/">
-          <img className={styles.Logo} src="/assets/logo.svg" alt="logo" />
+          <img className={styles.logo} src="/assets/logo.svg" alt="logo" />
         </Link>
       </nav>
     </header>
@@ -22,17 +22,17 @@ function Nav() {
   const user = null;
 
   return (
-    <header className={styles.Container}>
-      <nav className={styles.Nav}>
+    <header className={styles.container}>
+      <nav className={styles.nav}>
         <Link href="/">
-          <img className={styles.Logo} src="/assets/logo.svg" alt="logo" />
+          <img className={styles.logo} src="/assets/logo.svg" alt="logo" />
         </Link>
-        <div className={styles.Menu}>
+        <div className={styles.menu}>
           {user ? (
             <>
               {user.name}
               <Avatar src={user.avatar} size="small" />
-              <div className={styles.Divider} />
+              <div className={styles.divider} />
               {/* TODO: 로그아웃을 구현합니다. */}
               <Button appearance="secondary">로그아웃</Button>
             </>

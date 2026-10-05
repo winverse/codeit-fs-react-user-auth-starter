@@ -1,10 +1,10 @@
 import BaseLink from "next/link";
-import styles from "./Link.module.css";
+import * as styles from "./Link.css.js";
 
 function Link({ className = "", appearance = "primary", children, ...rest }) {
   return (
     <BaseLink
-      className={`${styles.Link} ${styles[appearance]} ${className}`}
+      className={`${styles.link} ${styles[appearance]} ${className}`}
       {...rest}
     >
       {children}
