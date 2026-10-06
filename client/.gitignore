@@ -16,7 +16,7 @@
 # next.js
 /.next/
 /out/
-# next dev가 첫 실행 때 만드는 AI 에이전트 안내 파일
+# AI 코딩 에이전트 환경에서 next dev가 만드는 안내 파일
 /AGENTS.md
 /CLAUDE.md
 
