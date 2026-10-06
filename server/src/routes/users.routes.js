@@ -56,6 +56,9 @@ userRouter.patch("/me", authMiddleware, upload.single("avatar"), (req, res) => {
   if (values.name !== undefined && values.name.trim() === "") {
     throw new BadRequestException(ERROR_MESSAGES.NAME_REQUIRED);
   }
+  if (values.bio !== undefined && values.bio.trim() === "") {
+    values.bio = null;
+  }
   const sameEmailUser =
     values.email && usersRepository.findUserByEmail(values.email);
   if (sameEmailUser && sameEmailUser.id !== req.user.id) {
