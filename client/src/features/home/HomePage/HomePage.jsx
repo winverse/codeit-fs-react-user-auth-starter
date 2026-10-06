@@ -1,5 +1,5 @@
-import Button from "@/components/Button";
-import Link from "@/components/Link";
+import { Button } from "@/components/Button";
+import { Link } from "@/components/Link";
 import * as styles from "./HomePage.css.js";
 
 function HomePage() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Nav, { PublicNav } from "./Nav";
+import { Nav, PublicNav } from "@/components/Nav";
 import * as styles from "./Layout.css.js";
 
 export function LandingLayout({ children }) {

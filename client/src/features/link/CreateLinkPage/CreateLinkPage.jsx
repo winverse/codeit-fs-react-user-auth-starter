@@ -5,9 +5,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { createMyLink } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import Label from "@/components/Label";
-import Input from "@/components/Input";
-import Button from "@/components/Button";
+import { Label } from "@/components/Label";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
 import * as styles from "./CreateLinkPage.css.js";
 
 function CreateLinkPage() {

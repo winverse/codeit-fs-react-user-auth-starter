@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Avatar from "./Avatar";
-import Button from "./Button";
+import { Avatar } from "@/components/Avatar";
+import { Button } from "@/components/Button";
 import * as styles from "./AvatarInput.css.js";
 
 function AvatarInput({ className, initialAvatar, name, onChange }) {

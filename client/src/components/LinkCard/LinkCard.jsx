@@ -1,5 +1,5 @@
-import Card from "./Card";
-import Link from "./Link";
+import { Card } from "@/components/Card";
+import { Link } from "@/components/Link";
 import * as styles from "./LinkCard.css.js";
 
 function LinkCard({ thumbUrl, title, url, onClick, onDelete }) {

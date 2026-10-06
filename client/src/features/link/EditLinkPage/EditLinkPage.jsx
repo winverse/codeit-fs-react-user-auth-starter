@@ -5,9 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { getMyLink, updateMyLink } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import Label from "@/components/Label";
-import Input from "@/components/Input";
-import Button from "@/components/Button";
+import { Label } from "@/components/Label";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
 import * as styles from "./EditLinkPage.css.js";
 
 function EditLinkForm({ linkId, link }) {

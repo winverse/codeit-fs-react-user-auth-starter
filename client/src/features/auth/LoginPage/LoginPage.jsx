@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Label from "@/components/Label";
-import Input from "@/components/Input";
-import Button from "@/components/Button";
-import HorizontalRule from "@/components/HorizontalRule";
-import Link from "@/components/Link";
+import { Label } from "@/components/Label";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import { HorizontalRule } from "@/components/HorizontalRule";
+import { Link } from "@/components/Link";
 import * as styles from "./LoginPage.css.js";
 
 function LoginPage() {

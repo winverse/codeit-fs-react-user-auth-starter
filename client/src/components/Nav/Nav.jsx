@@ -1,8 +1,8 @@
 "use client";
 
-import Avatar from "./Avatar";
-import Button from "./Button";
-import Link from "./Link";
+import { Avatar } from "@/components/Avatar";
+import { Button } from "@/components/Button";
+import { Link } from "@/components/Link";
 import * as styles from "./Nav.css.js";
 
 export function PublicNav() {

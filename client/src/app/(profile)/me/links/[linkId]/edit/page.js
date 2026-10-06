@@ -1,4 +1,4 @@
-import EditLinkPage from "@/features/EditLinkPage";
+import { EditLinkPage } from "@/features/link/EditLinkPage";
 
 export default function Page() {
   return <EditLinkPage />;

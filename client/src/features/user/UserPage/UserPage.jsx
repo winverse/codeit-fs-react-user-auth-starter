@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { getUser, getUserLinks } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import Avatar from "@/components/Avatar";
-import Card from "@/components/Card";
-import HorizontalRule from "@/components/HorizontalRule";
-import LinkCard from "@/components/LinkCard";
+import { Avatar } from "@/components/Avatar";
+import { Card } from "@/components/Card";
+import { HorizontalRule } from "@/components/HorizontalRule";
+import { LinkCard } from "@/components/LinkCard";
 import * as styles from "./UserPage.css.js";
 
 function UserPage() {

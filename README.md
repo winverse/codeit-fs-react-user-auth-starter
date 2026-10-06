@@ -31,7 +31,7 @@ pnpm dev
 ## 처음 상태
 
 - 화면(페이지 이동, 입력 폼)과 스타일은 모두 제공됩니다. 스타일은 vanilla-extract로 작성한 `*.css.js` 파일입니다.
-- 마이 페이지, 링크 추가·수정·삭제, 프로필 편집, 유저 페이지의 요청 코드는 React Query로 작성되어 있습니다. 서버를 부르는 함수는 `client/src/lib/api.js`, 쿼리 키는 `client/src/lib/queryKeys.js`에 모여 있고, `QueryClientProvider`는 `client/src/components/Providers.jsx`에 등록되어 있습니다.
+- 마이 페이지, 링크 추가·수정·삭제, 프로필 편집, 유저 페이지의 요청 코드는 React Query로 작성되어 있습니다. 서버를 부르는 함수는 `client/src/lib/api.js`, 쿼리 키는 `client/src/lib/queryKeys.js`에 모여 있고, `QueryClientProvider`는 `client/src/components/Providers/Providers.jsx`에 등록되어 있습니다.
 - 회원가입, 로그인, 상단 메뉴의 유저 정보, 로그아웃, 구글로 시작하기 버튼은 아직 동작하지 않습니다. 해당 자리에는 `TODO` 주석이 있습니다.
 - 로그인하지 않은 상태라 `/me`(마이 페이지)는 빈 화면입니다.
 
@@ -40,12 +40,12 @@ pnpm dev
 | 파일 | 내용 |
 | --- | --- |
 | `client/src/lib/api.js` | 서버 요청 함수(회원가입·로그인·로그아웃 함수 추가) |
-| `client/src/features/RegisterPage.jsx` | 회원가입 |
-| `client/src/features/LoginPage.jsx` | 로그인 |
+| `client/src/features/auth/RegisterPage/RegisterPage.jsx` | 회원가입 |
+| `client/src/features/auth/LoginPage/LoginPage.jsx` | 로그인 |
 | `client/src/lib/axios.js` | 요청 기본 설정, 토큰 갱신 |
 | `client/src/contexts/AuthProvider.jsx` | 유저 데이터 관리(교재에서 새로 만듦) |
-| `client/src/components/Providers.jsx`, `client/src/components/Nav.jsx` | `AuthProvider` 등록, 상단 메뉴 |
-| `client/src/features/*Page.jsx` | 로그인 상태에 따른 리다이렉트 |
+| `client/src/components/Providers/Providers.jsx`, `client/src/components/Nav/Nav.jsx` | `AuthProvider` 등록, 상단 메뉴 |
+| `client/src/features/*/*Page/*Page.jsx` | 로그인 상태에 따른 리다이렉트 |
 | `client/next.config.mjs` | 구글 로그인을 위한 프록시 설정 |
 
 ## 구글 로그인

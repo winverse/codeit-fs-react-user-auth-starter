@@ -5,11 +5,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { getMe, updateMe } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import Label from "@/components/Label";
-import Input from "@/components/Input";
-import Button from "@/components/Button";
-import TextArea from "@/components/TextArea";
-import AvatarInput from "@/components/AvatarInput";
+import { Label } from "@/components/Label";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import { TextArea } from "@/components/TextArea";
+import { AvatarInput } from "@/components/AvatarInput";
 import * as styles from "./SettingPage.css.js";
 
 function SettingForm({ user }) {

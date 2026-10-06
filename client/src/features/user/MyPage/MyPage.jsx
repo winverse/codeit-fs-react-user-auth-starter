@@ -4,12 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { deleteMyLink, getMe, getMyLinks } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import Avatar from "@/components/Avatar";
-import Button from "@/components/Button";
-import Card from "@/components/Card";
-import Link from "@/components/Link";
-import HorizontalRule from "@/components/HorizontalRule";
-import LinkCard from "@/components/LinkCard";
+import { Avatar } from "@/components/Avatar";
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
+import { Link } from "@/components/Link";
+import { HorizontalRule } from "@/components/HorizontalRule";
+import { LinkCard } from "@/components/LinkCard";
 import * as styles from "./MyPage.css.js";
 
 function MyPage() {
