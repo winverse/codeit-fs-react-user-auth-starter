@@ -1,56 +1,49 @@
 import { randomBytes } from "node:crypto";
-import { Router } from "express";
+import express from "express";
+import { config } from "#config";
+import { ERROR_MESSAGES, HTTP_STATUS } from "#constants";
+import { UnauthorizedException } from "#errors";
+import { authMiddleware } from "#middlewares";
+import { usersRepository } from "#repository";
 import {
   clearAuthCookies,
-  requireAuth,
+  comparePassword,
   setAuthCookies,
-  userFromRefreshToken,
-  verifyPassword,
-} from "../auth.js";
-import {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URI,
-} from "../config.js";
-import { createUser, findUserByEmail, updateUser } from "../db.js";
+  verifyToken,
+} from "#utils";
 
-const router = Router();
+export const authRouter = express.Router();
 
-router.post("/login", (req, res) => {
+authRouter.post("/login", (req, res) => {
   const { email, password } = req.body ?? {};
-  const user = findUserByEmail(email);
-  if (!user || !verifyPassword(String(password ?? ""), user.passwordHash)) {
-    res
-      .status(401)
-      .json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
-    return;
+  const user = usersRepository.findUserByEmail(email);
+  if (!user || !comparePassword(String(password ?? ""), user.passwordHash)) {
+    throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
   }
   setAuthCookies(res, user);
-  res.sendStatus(200);
+  res.sendStatus(HTTP_STATUS.OK);
 });
 
-router.delete("/logout", requireAuth, (req, res) => {
+authRouter.delete("/logout", authMiddleware, (req, res) => {
   clearAuthCookies(res);
-  res.sendStatus(200);
+  res.sendStatus(HTTP_STATUS.OK);
 });
 
-router.post("/token/refresh", (req, res) => {
-  const user = userFromRefreshToken(req);
+authRouter.post("/token/refresh", (req, res) => {
+  const payload = verifyToken(req.cookies["refresh-token"], "refresh");
+  const user = payload && usersRepository.findUserById(payload.sub);
   if (!user) {
-    res.status(401).json({ message: "Refresh Token이 올바르지 않습니다." });
-    return;
+    throw new UnauthorizedException(ERROR_MESSAGES.INVALID_REFRESH_TOKEN);
   }
   setAuthCookies(res, user);
-  res.sendStatus(200);
+  res.sendStatus(HTTP_STATUS.OK);
 });
 
-router.get("/google", (req, res) => {
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+authRouter.get("/google", (req, res) => {
+  if (!config.GOOGLE_CLIENT_ID || !config.GOOGLE_CLIENT_SECRET) {
     res
-      .status(500)
-      .send(
-        "server/.env에 GOOGLE_CLIENT_ID와 GOOGLE_CLIENT_SECRET을 설정해 주세요.",
-      );
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .send(ERROR_MESSAGES.GOOGLE_ENV_REQUIRED);
     return;
   }
   const state = randomBytes(16).toString("hex");
@@ -61,8 +54,8 @@ router.get("/google", (req, res) => {
     maxAge: 10 * 60 * 1000,
   });
   const params = new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: GOOGLE_REDIRECT_URI,
+    client_id: config.GOOGLE_CLIENT_ID,
+    redirect_uri: config.GOOGLE_REDIRECT_URI,
     response_type: "code",
     scope: [
       "https://www.googleapis.com/auth/userinfo.email",
@@ -73,7 +66,7 @@ router.get("/google", (req, res) => {
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
 
-router.get("/google/callback", async (req, res) => {
+authRouter.get("/google/callback", async (req, res) => {
   const { code, state } = req.query;
   const savedState = req.cookies["google-oauth-state"];
   res.clearCookie("google-oauth-state", { path: "/api/auth/google" });
@@ -87,9 +80,9 @@ router.get("/google/callback", async (req, res) => {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       code,
-      client_id: GOOGLE_CLIENT_ID,
-      client_secret: GOOGLE_CLIENT_SECRET,
-      redirect_uri: GOOGLE_REDIRECT_URI,
+      client_id: config.GOOGLE_CLIENT_ID,
+      client_secret: config.GOOGLE_CLIENT_SECRET,
+      redirect_uri: config.GOOGLE_REDIRECT_URI,
       grant_type: "authorization_code",
     }),
   });
@@ -109,20 +102,18 @@ router.get("/google/callback", async (req, res) => {
   }
   const profile = await profileResponse.json();
 
-  let user = findUserByEmail(profile.email);
+  let user = usersRepository.findUserByEmail(profile.email);
   if (!user) {
-    user = createUser({
+    user = usersRepository.createUser({
       email: profile.email,
       name: profile.name,
       avatar: profile.picture ?? null,
       googleId: profile.id,
     });
   } else if (!user.googleId) {
-    updateUser(user, { googleId: profile.id });
+    usersRepository.updateUser(user, { googleId: profile.id });
   }
 
   setAuthCookies(res, user);
   res.redirect("/");
 });
-
-export default router;

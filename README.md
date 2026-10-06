@@ -50,7 +50,7 @@ pnpm dev
 
 ## 구글 로그인
 
-구글 로그인 단계에서는 Google Cloud에서 발급한 값을 `server/.env`에 넣습니다. `server/.env.example`을 복사해 `server/.env`를 만들고 값을 채웁니다. `.env`는 Git에 올라가지 않습니다.
+구글 로그인 단계에서는 Google Cloud에서 발급한 값을 `server/env/.env.development`에 넣습니다. `server/env/.env.example`을 복사해 `server/env/.env.development`를 만들고 값을 채웁니다. 이 파일은 Git에 올라가지 않습니다.
 
 ```text
 GOOGLE_CLIENT_ID=발급받은 클라이언트 ID
