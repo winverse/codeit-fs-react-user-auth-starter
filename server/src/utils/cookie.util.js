@@ -1,32 +1,50 @@
+import { config } from "#config";
 import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE } from "#constants";
-import { generateAccessToken, generateRefreshToken } from "./jwt.util.js";
 
-const ACCESS_COOKIE = {
+const accessCookieOptions = {
   httpOnly: true,
+  secure: config.NODE_ENV === "production",
   sameSite: "lax",
   path: "/api",
 };
 
-const REFRESH_COOKIE = {
+const refreshCookieOptions = {
   httpOnly: true,
+  secure: config.NODE_ENV === "production",
   sameSite: "lax",
   path: "/api/auth",
 };
 
-export function setAuthCookies(res, user) {
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+const googleStateCookieOptions = {
+  httpOnly: true,
+  secure: config.NODE_ENV === "production",
+  sameSite: "lax",
+  path: "/api/auth/google",
+};
+
+export function setAuthCookies(res, { accessToken, refreshToken }) {
   res.cookie("access-token", accessToken, {
-    ...ACCESS_COOKIE,
+    ...accessCookieOptions,
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
   res.cookie("refresh-token", refreshToken, {
-    ...REFRESH_COOKIE,
+    ...refreshCookieOptions,
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 }
 
 export function clearAuthCookies(res) {
-  res.clearCookie("access-token", ACCESS_COOKIE);
-  res.clearCookie("refresh-token", REFRESH_COOKIE);
+  res.clearCookie("access-token", accessCookieOptions);
+  res.clearCookie("refresh-token", refreshCookieOptions);
+}
+
+export function setGoogleStateCookie(res, state) {
+  res.cookie("google-oauth-state", state, {
+    ...googleStateCookieOptions,
+    maxAge: 10 * 60 * 1000, // 10분
+  });
+}
+
+export function clearGoogleStateCookie(res) {
+  res.clearCookie("google-oauth-state", googleStateCookieOptions);
 }

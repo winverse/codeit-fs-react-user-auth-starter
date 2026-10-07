@@ -25,7 +25,7 @@ pnpm install
 pnpm dev
 ```
 
-- 터미널 1에 `서버가 http://localhost:3001에서 실행 중입니다.`가 출력됩니다. 브라우저에서 `http://localhost:3001/api`를 열면 `OK`가 보입니다.
+- 터미널 1에 `서버가 http://localhost:3001에서 실행 중입니다.`가 출력됩니다. 그 앞에 출력되는 `./env/.env.development not found. Continuing without it.`는 `env/.env.development` 파일이 없다는 안내이며, 이 파일이 없어도 서버는 실행되므로 그대로 둡니다. 브라우저에서 `http://localhost:3001/api`를 열면 `OK`가 보입니다.
 - 브라우저에서 `http://localhost:3000`을 열면 `나의 링크들을 하나로 관리하세요.` 홈 화면이 보입니다.
 
 ## 처음 상태
@@ -53,6 +53,6 @@ pnpm dev
 구글 로그인 단계에서는 Google Cloud에서 발급한 값을 `server/env/.env.development`에 넣습니다. `server/env/.env.example`을 복사해 `server/env/.env.development`를 만들고 값을 채웁니다. 이 파일은 Git에 올라가지 않습니다.
 
 ```text
-GOOGLE_CLIENT_ID=발급받은 클라이언트 ID
-GOOGLE_CLIENT_SECRET=발급받은 클라이언트 보안 비밀번호
+GOOGLE_CLIENT_ID=발급받은 Client ID
+GOOGLE_CLIENT_SECRET=발급받은 Client Secret
 ```

@@ -1,139 +1,176 @@
 import express from "express";
-import { config } from "#config";
 import { ERROR_MESSAGES, HTTP_STATUS } from "#constants";
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from "#errors";
-import { authMiddleware, upload } from "#middlewares";
+import { ConflictException, NotFoundException } from "#errors";
+import { authMiddleware, upload, validate } from "#middlewares";
 import { linksRepository, usersRepository } from "#repository";
-import { hashPassword } from "#utils";
-
-function avatarUrl(file) {
-  return file ? `${config.SERVER_URL}/api/uploads/${file.filename}` : undefined;
-}
-
-function pick(body, keys) {
-  return Object.fromEntries(
-    keys
-      .filter((key) => typeof body?.[key] === "string")
-      .map((key) => [key, body[key]]),
-  );
-}
+import { hashPassword, toAvatarUrl } from "#utils";
+import {
+  createLinkSchema,
+  linkIdParamSchema,
+  signUpSchema,
+  updateLinkSchema,
+  updateUserSchema,
+} from "./users.schemas.js";
 
 export const userRouter = express.Router();
 
-userRouter.post("/", upload.single("avatar"), (req, res) => {
-  const { email, name, password, bio } = req.body ?? {};
-  if (!email || !name || !password) {
-    throw new BadRequestException(ERROR_MESSAGES.USER_FIELDS_REQUIRED);
+// POST /api/users - 회원가입
+userRouter.post(
+  "/",
+  upload.single("avatar"),
+  validate("body", signUpSchema),
+  async (req, res) => {
+    const { email, name, password, bio } = req.validated.body;
+    const sameEmailUser = await usersRepository.findByEmail(email);
+
+    if (sameEmailUser) {
+      throw new ConflictException(ERROR_MESSAGES.EMAIL_ALREADY_IN_USE);
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const user = await usersRepository.create({
+      email,
+      name,
+      password: hashedPassword,
+      avatar: toAvatarUrl(req.file),
+      bio,
+    });
+    return res.status(HTTP_STATUS.CREATED).json(user);
+  },
+);
+
+// GET /api/users/me - 내 정보 조회
+userRouter.get("/me", authMiddleware, async (req, res) => {
+  const me = await usersRepository.findById(req.user.id);
+
+  if (!me) {
+    throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
   }
-  if (usersRepository.findUserByEmail(email)) {
-    throw new ConflictException(ERROR_MESSAGES.EMAIL_ALREADY_IN_USE);
-  }
-  const user = usersRepository.createUser({
-    email,
-    name,
-    passwordHash: hashPassword(String(password)),
-    avatar: avatarUrl(req.file) ?? null,
-  });
-  if (bio) {
-    usersRepository.updateUser(user, { bio });
-  }
-  res.status(HTTP_STATUS.CREATED).json(usersRepository.toPublicUser(user));
+
+  return res.json(me);
 });
 
-userRouter.get("/me", authMiddleware, (req, res) => {
-  res.json(usersRepository.toPublicUser(req.user));
+// PATCH /api/users/me - 내 정보 수정
+userRouter.patch(
+  "/me",
+  authMiddleware,
+  upload.single("avatar"),
+  validate("body", updateUserSchema),
+  async (req, res) => {
+    const values = req.validated.body;
+    const me = await usersRepository.findById(req.user.id);
+
+    if (!me) {
+      throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+    }
+
+    if (values.email) {
+      const sameEmailUser = await usersRepository.findByEmail(values.email);
+
+      if (sameEmailUser && sameEmailUser.id !== me.id) {
+        throw new ConflictException(ERROR_MESSAGES.EMAIL_ALREADY_IN_USE);
+      }
+    }
+
+    if (req.file) {
+      values.avatar = toAvatarUrl(req.file);
+    }
+
+    const updatedUser = await usersRepository.update(me.id, values);
+    return res.json(updatedUser);
+  },
+);
+
+// GET /api/users/me/links - 내 링크 목록 조회
+userRouter.get("/me/links", authMiddleware, async (req, res) => {
+  const links = await linksRepository.findAllByUserId(req.user.id);
+  return res.json(links);
 });
 
-userRouter.patch("/me", authMiddleware, upload.single("avatar"), (req, res) => {
-  const values = pick(req.body, ["email", "name", "bio"]);
-  if (values.email !== undefined && values.email.trim() === "") {
-    throw new BadRequestException(ERROR_MESSAGES.EMAIL_REQUIRED);
-  }
-  if (values.name !== undefined && values.name.trim() === "") {
-    throw new BadRequestException(ERROR_MESSAGES.NAME_REQUIRED);
-  }
-  if (values.bio !== undefined && values.bio.trim() === "") {
-    values.bio = null;
-  }
-  const sameEmailUser =
-    values.email && usersRepository.findUserByEmail(values.email);
-  if (sameEmailUser && sameEmailUser.id !== req.user.id) {
-    throw new ConflictException(ERROR_MESSAGES.EMAIL_ALREADY_IN_USE);
-  }
-  if (req.file) {
-    values.avatar = avatarUrl(req.file);
-  }
-  res.json(
-    usersRepository.toPublicUser(usersRepository.updateUser(req.user, values)),
+// GET /api/users/me/links/:linkId - 내 링크 하나 조회
+userRouter.get("/me/links/:linkId", authMiddleware, async (req, res) => {
+  const link = await linksRepository.findByIdAndUserId(
+    req.params.linkId,
+    req.user.id,
   );
-});
 
-userRouter.get("/me/links", authMiddleware, (req, res) => {
-  res.json(
-    linksRepository.findLinks(req.user.id).map(linksRepository.toPublicLink),
-  );
-});
-
-userRouter.get("/me/links/:linkId", authMiddleware, (req, res) => {
-  const link = linksRepository.findLink(req.user.id, req.params.linkId);
   if (!link) {
     throw new NotFoundException(ERROR_MESSAGES.LINK_NOT_FOUND);
   }
-  res.json(linksRepository.toPublicLink(link));
+
+  return res.json(link);
 });
 
-userRouter.post("/me/links", authMiddleware, (req, res) => {
-  const { title, url } = req.body ?? {};
-  if (!title || !url) {
-    throw new BadRequestException(ERROR_MESSAGES.LINK_FIELDS_REQUIRED);
-  }
-  res.json(
-    linksRepository.toPublicLink(
-      linksRepository.createLink(req.user.id, { title, url }),
-    ),
-  );
-});
+// POST /api/users/me/links - 링크 추가
+userRouter.post(
+  "/me/links",
+  authMiddleware,
+  validate("body", createLinkSchema),
+  async (req, res) => {
+    const link = await linksRepository.create(req.user.id, req.validated.body);
+    return res.json(link);
+  },
+);
 
-userRouter.patch("/me/links/:linkId", authMiddleware, (req, res) => {
-  const link = linksRepository.findLink(req.user.id, req.params.linkId);
-  if (!link) {
-    throw new NotFoundException(ERROR_MESSAGES.LINK_NOT_FOUND);
-  }
-  res.json(
-    linksRepository.toPublicLink(
-      linksRepository.updateLink(link, pick(req.body, ["title", "url"])),
-    ),
-  );
-});
+// PATCH /api/users/me/links/:linkId - 링크 수정
+userRouter.patch(
+  "/me/links/:linkId",
+  authMiddleware,
+  validate("params", linkIdParamSchema),
+  validate("body", updateLinkSchema),
+  async (req, res) => {
+    const { linkId } = req.validated.params;
+    const link = await linksRepository.findByIdAndUserId(linkId, req.user.id);
 
-userRouter.delete("/me/links/:linkId", authMiddleware, (req, res) => {
-  const link = linksRepository.findLink(req.user.id, req.params.linkId);
-  if (!link) {
-    throw new NotFoundException(ERROR_MESSAGES.LINK_NOT_FOUND);
-  }
-  linksRepository.deleteLink(link);
-  res.sendStatus(HTTP_STATUS.NO_CONTENT);
-});
+    if (!link) {
+      throw new NotFoundException(ERROR_MESSAGES.LINK_NOT_FOUND);
+    }
 
-userRouter.get("/:userId", (req, res) => {
-  const user = usersRepository.findUserById(req.params.userId);
+    const updatedLink = await linksRepository.update(
+      linkId,
+      req.validated.body,
+    );
+    return res.json(updatedLink);
+  },
+);
+
+// DELETE /api/users/me/links/:linkId - 링크 삭제
+userRouter.delete(
+  "/me/links/:linkId",
+  authMiddleware,
+  validate("params", linkIdParamSchema),
+  async (req, res) => {
+    const { linkId } = req.validated.params;
+    const link = await linksRepository.findByIdAndUserId(linkId, req.user.id);
+
+    if (!link) {
+      throw new NotFoundException(ERROR_MESSAGES.LINK_NOT_FOUND);
+    }
+
+    await linksRepository.remove(linkId);
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+  },
+);
+
+// GET /api/users/:userId - 다른 유저의 공개 정보 조회
+userRouter.get("/:userId", async (req, res) => {
+  const user = await usersRepository.findById(req.params.userId);
+
   if (!user) {
     throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
   }
-  res.json(usersRepository.toPublicUser(user));
+
+  return res.json(user);
 });
 
-userRouter.get("/:userId/links", (req, res) => {
-  if (!usersRepository.findUserById(req.params.userId)) {
+// GET /api/users/:userId/links - 다른 유저의 링크 목록 조회
+userRouter.get("/:userId/links", async (req, res) => {
+  const user = await usersRepository.findById(req.params.userId);
+
+  if (!user) {
     throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
   }
-  res.json(
-    linksRepository
-      .findLinks(req.params.userId)
-      .map(linksRepository.toPublicLink),
-  );
+
+  const links = await linksRepository.findAllByUserId(user.id);
+  return res.json(links);
 });

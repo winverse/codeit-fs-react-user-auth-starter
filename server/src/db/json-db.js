@@ -19,5 +19,5 @@ export function save() {
 }
 
 export function now() {
-  return Math.floor(Date.now() / 1000);
+  return Math.floor(Date.now() / 1000); // 초 단위 Unix 시각
 }

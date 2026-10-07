@@ -1,16 +1,15 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import bcrypt from "bcrypt";
+
+const BCRYPT_COST = 10;
 
 export function hashPassword(password) {
-  const salt = randomBytes(16).toString("hex");
-  const hash = scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${hash}`;
+  return bcrypt.hash(password, BCRYPT_COST);
 }
 
-export function comparePassword(password, passwordHash) {
-  if (!passwordHash) {
+export async function comparePassword(password, passwordHash) {
+  try {
+    return await bcrypt.compare(password, passwordHash);
+  } catch {
     return false;
   }
-  const [salt, hash] = passwordHash.split(":");
-  const input = scryptSync(password, salt, 64);
-  return timingSafeEqual(input, Buffer.from(hash, "hex"));
 }
