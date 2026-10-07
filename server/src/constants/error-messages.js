@@ -5,7 +5,6 @@ export const ERROR_MESSAGES = {
   INVALID_JSON: "요청 바디가 올바른 JSON 형식이 아닙니다.",
   REQUEST_BODY_REQUIRED: "요청 바디가 필요합니다.",
   ORIGIN_NOT_ALLOWED: "허용되지 않은 출처입니다.",
-  ROUTE_NOT_FOUND: "요청한 경로를 찾을 수 없습니다.",
   USER_FIELDS_REQUIRED: "email, name, password는 필수입니다.",
   LOGIN_FIELDS_REQUIRED: "email, password는 필수입니다.",
   EMAIL_ALREADY_IN_USE: "이미 가입한 이메일입니다.",
